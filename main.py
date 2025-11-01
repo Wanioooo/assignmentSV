@@ -3,9 +3,6 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-# Set up the Streamlit page configuration
-st.set_page_config(layout="wide", page_title="Drug Distribution Analysis")
-
 ## 🚀 Data Loading and Preparation
 # Define the URL of the CSV file
 URL = "https://raw.githubusercontent.com/Wanioooo/assignmentSV/refs/heads/main/processed_drug_data.csv"
@@ -94,10 +91,6 @@ else:
 
 st.markdown("---")
 st.caption("Application powered by Streamlit and Plotly.")
-
-
-# Set up the Streamlit page configuration
-st.set_page_config(layout="wide", page_title="Gender Distribution of Drug Users")
 
 ## 🚀 Data Loading
 # Define the URL of the CSV file (Assuming the same URL from the previous request)
