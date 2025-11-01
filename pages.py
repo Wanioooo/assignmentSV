@@ -9,7 +9,9 @@ visualise = st.Page('main.py', title='Pencapaian Akademik Pelajar', icon=":mater
 home = st.Page('home.py', title='Homepage', default=True, icon=":material/home:")
 
 pg = st.navigation(
-             [home, visualise]    
+             {
+                 "Menu":[home, visualise] 
+             }
 )
 
 pg.run()
