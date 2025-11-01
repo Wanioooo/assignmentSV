@@ -94,3 +94,62 @@ else:
 
 st.markdown("---")
 st.caption("Application powered by Streamlit and Plotly.")
+
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+
+# Set up the Streamlit page configuration
+st.set_page_config(layout="wide", page_title="Gender Distribution Pie Chart")
+
+st.title("Distribution of Drug Users by Gender")
+
+# --- ASSUMED DATA PREPARATION (Based on a typical scenario) ---
+# NOTE: Replace this section with your actual data loading and processing
+# if your gender_counts calculation is more complex.
+
+# 1. Simulate data loading (You should replace this with your actual DataFrame 'df')
+# For demonstration, I'll use a simple mock DataFrame
+data = {
+    'Gender': ['Male', 'Female', 'Male', 'Non-Binary', 'Female', 'Male', 'Female', 'Male', 'Male', 'Female']
+}
+df = pd.DataFrame(data) 
+# Assuming you have loaded your main DataFrame 'df' earlier
+
+# 2. Calculate the 'gender_counts' DataFrame
+# This step replaces the matplotlib data preparation logic
+gender_counts = df['Gender'].value_counts().reset_index()
+gender_counts.columns = ['Gender', 'Count']
+
+# --- PLOTLY VISUALIZATION ---
+
+if not gender_counts.empty:
+    st.subheader("Gender Count Data")
+    st.dataframe(gender_counts)
+    
+    # Create the Plotly Pie Chart
+    # Plotly Express automatically calculates proportions for pie charts
+    fig = px.pie(
+        gender_counts, 
+        values='Count', 
+        names='Gender', 
+        title='**Distribution of Drug Users by Gender**',
+        # Set the starting angle and colors for a more visually appealing chart
+        hole=0.3, # Creates a donut chart (optional, but often preferred)
+        color_discrete_sequence=px.colors.qualitative.Pastel # Use a nice color scheme
+    )
+    
+    # Customize the figure layout
+    fig.update_traces(
+        textposition='inside', 
+        textinfo='percent+label', 
+        pull=[0.05 if label == gender_counts['Gender'].iloc[0] else 0 for label in gender_counts['Gender']], # Optional: pulls out the largest slice
+        marker=dict(line=dict(color='#000000', width=1))
+    )
+    
+    # Display the Plotly chart in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
+    
+else:
+    st.warning("Gender data is not available or the DataFrame is empty.")
+
