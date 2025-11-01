@@ -1,155 +1,75 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.express as px
 
 # Set up the Streamlit page configuration
-st.set_page_config(layout="wide", page_title="Drug Distribution Analysis")
+st.set_page_config(layout="wide", page_title="Gender Distribution")
 
-## 🚀 Data Loading and Preparation
-# Define the URL of the CSV file
-URL = "https://raw.githubusercontent.com/Wanioooo/assignmentSV/refs/heads/main/processed_drug_data.csv"
+st.title("Gender Distribution of Drug Users")
 
-@st.cache_data
-def load_data(url):
-    """Loads the data from the URL and handles potential errors."""
-    try:
-        # Read the CSV file into a pandas DataFrame
-        df = pd.read_csv(url)
-        return df
-    except Exception as e:
-        st.error(f"An error occurred while loading the data: {e}")
-        return pd.DataFrame() # Return an empty DataFrame on failure
+## 🚀 Data Loading (Placeholder - Replace with your actual data loading)
+# Assuming 'drug_users_df' is the main DataFrame from your application.
+# --- Placeholder DataFrame Creation ---
+data = {'Gender': ['Male', 'Female', 'Male', 'Female', 'Male', 'Other', 'Female', 'Male', 'Female', 'Male']}
+drug_users_df = pd.DataFrame(data)
 
-st.title("Drug Type Distribution by Age Group")
+# You can uncomment and use the data loading logic from your previous query if applicable:
+# URL = "https://raw.githubusercontent.com/Wanioooo/assignmentSV/refs/heads/main/processed_drug_data.csv"
+# try:
+#     drug_users_df = pd.read_csv(URL)
+# except Exception as e:
+#     st.error(f"Error loading data: {e}")
+#     drug_users_df = pd.DataFrame() 
+# ----------------------------------------
 
-arts_df_online = load_data(URL)
 
-if not arts_df_online.empty:
-    st.subheader("Raw Data Preview")
-    st.dataframe(arts_df_online)
+if not drug_users_df.empty:
     
-    # Use a copy of the loaded DataFrame for processing
-    df = arts_df_online.copy()
-
     ### 🧮 Data Processing
     
-    # Define age groups
-    bins = [0, 18, 25, 35, 50, np.inf]
-    labels = ['<18', '18-25', '26-35', '36-50', '51+']
+    # 1. Calculate the counts of each gender
+    gender_counts = drug_users_df['Gender'].value_counts().reset_index()
+    gender_counts.columns = ['Gender', 'Count']
     
-    # Assuming 'Age' column exists (based on your original code)
-    if 'Age' in df.columns:
-        df['Age_Group'] = pd.cut(df['Age'], bins=bins, labels=labels, right=False, include_lowest=True)
-        
-        # Group data by age group and drug type and count occurrences
-        DRUG_COLUMN = 'What is the name of the drug you used for the 1st time?'
-        
-        # Group data and count occurrences
-        drug_age_counts = df.groupby(['Age_Group', DRUG_COLUMN], observed=True).size().reset_index(name='Count')
-        
-        st.subheader("Count of Drug Use by Age Group and Drug Type")
-        st.dataframe(drug_age_counts.head())
-        
-        # Pivot the data to create a matrix for the heatmap
-        heatmap_data = drug_age_counts.pivot(
-            index='Age_Group', 
-            columns=DRUG_COLUMN, 
-            values='Count'
-        ).fillna(0)
-        
-        st.subheader("Heatmap Data Matrix")
-        st.dataframe(heatmap_data)
-        
-        ### 📈 Plotly Heatmap Visualization
-        
-        st.subheader("Interactive Drug Type Distribution Heatmap")
-        
-        # Use plotly.express.imshow to create the heatmap
-        # We pass the pivoted DataFrame directly to px.imshow
-        fig = px.imshow(
-            heatmap_data, 
-            x=heatmap_data.columns.tolist(), 
-            y=heatmap_data.index.tolist(),
-            color_continuous_scale='YlGnBu', # Matching the original Seaborn color map style
-            text_auto=True, # Automatically display the count value on each cell
-            aspect="auto"
-        )
-        
-        # Update layout for better appearance and titles
-        fig.update_layout(
-            title_text='**Drug Type Distribution by Age Group**',
-            xaxis_title=DRUG_COLUMN,
-            yaxis_title='Age Group',
-            xaxis={'side': 'bottom'}
-        )
-        
-        # Display the Plotly chart in Streamlit
-        st.plotly_chart(fig, use_container_width=True)
-
-    else:
-        st.error("The DataFrame must contain an 'Age' column to create age groups.")
-else:
-    st.warning("Could not proceed with data processing and visualization as data loading failed.")
-
-st.markdown("---")
-st.caption("Application powered by Streamlit and Plotly.")
-
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-
-# Set up the Streamlit page configuration
-st.set_page_config(layout="wide", page_title="Gender Distribution Pie Chart")
-
-st.title("Distribution of Drug Users by Gender")
-
-# --- ASSUMED DATA PREPARATION (Based on a typical scenario) ---
-# NOTE: Replace this section with your actual data loading and processing
-# if your gender_counts calculation is more complex.
-
-# 1. Simulate data loading (You should replace this with your actual DataFrame 'df')
-# For demonstration, I'll use a simple mock DataFrame
-data = {
-    'Gender': ['Male', 'Female', 'Male', 'Non-Binary', 'Female', 'Male', 'Female', 'Male', 'Male', 'Female']
-}
-df = pd.DataFrame(data) 
-# Assuming you have loaded your main DataFrame 'df' earlier
-
-# 2. Calculate the 'gender_counts' DataFrame
-# This step replaces the matplotlib data preparation logic
-gender_counts = df['Gender'].value_counts().reset_index()
-gender_counts.columns = ['Gender', 'Count']
-
-# --- PLOTLY VISUALIZATION ---
-
-if not gender_counts.empty:
-    st.subheader("Gender Count Data")
-    st.dataframe(gender_counts)
+    st.subheader("Gender Counts Table")
+    st.dataframe(gender_counts, use_container_width=True)
     
-    # Create the Plotly Pie Chart
-    # Plotly Express automatically calculates proportions for pie charts
+    
+    ### 📈 Plotly Pie Chart Visualization
+    
+    st.subheader("Interactive Distribution of Drug Users by Gender")
+    
+    # Create the Plotly Pie Chart using the calculated counts
     fig = px.pie(
         gender_counts, 
         values='Count', 
         names='Gender', 
         title='**Distribution of Drug Users by Gender**',
-        # Set the starting angle and colors for a more visually appealing chart
-        hole=0.3, # Creates a donut chart (optional, but often preferred)
-        color_discrete_sequence=px.colors.qualitative.Pastel # Use a nice color scheme
+        # Set text to show percentage and label inside the slices
+        # 'percent' will match the autopct='%1.1f%%' from your original code
+        hole=0.3, # Optional: makes it a donut chart for better central text space
     )
     
-    # Customize the figure layout
+    # Optional: Customize the appearance for better readability
     fig.update_traces(
         textposition='inside', 
-        textinfo='percent+label', 
-        pull=[0.05 if label == gender_counts['Gender'].iloc[0] else 0 for label in gender_counts['Gender']], # Optional: pulls out the largest slice
+        textinfo='percent+label',
         marker=dict(line=dict(color='#000000', width=1))
+    )
+    
+    fig.update_layout(
+        uniformtext_minsize=12, 
+        uniformtext_mode='hide',
+        # Equal aspect ratio is default for Plotly pie charts but can be ensured
+        autosize=True,
+        margin=dict(t=50, b=0, l=0, r=0)
     )
     
     # Display the Plotly chart in Streamlit
     st.plotly_chart(fig, use_container_width=True)
-    
-else:
-    st.warning("Gender data is not available or the DataFrame is empty.")
 
+else:
+    st.warning("Data is empty. Please ensure the DataFrame is loaded correctly.")
+
+st.markdown("---")
+st.caption("Application powered by Streamlit and Plotly.")
