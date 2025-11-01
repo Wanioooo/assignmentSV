@@ -27,7 +27,7 @@ arts_df_online = load_data(URL)
 
 if not arts_df_online.empty:
     st.subheader("Raw Data Preview")
-    st.dataframe(arts_df_online.head())
+    st.dataframe(arts_df_online)
     
     # Use a copy of the loaded DataFrame for processing
     df = arts_df_online.copy()
